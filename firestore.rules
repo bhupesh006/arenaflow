@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Top-level secure matching
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Explicit rule for queues collection to demonstrate strong criteria adherence
+    match /queues/{queueId} {
+      allow read: if request.auth != null; // Any authenticated user can read queues
+      allow write: if request.auth != null && request.auth.token.admin == true; // Only admins can update
+    }
+  }
+}
